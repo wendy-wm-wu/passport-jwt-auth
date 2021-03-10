@@ -1,22 +1,24 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const session = require('express-session');
+const cors = require('cors');
+const path = require('path');
 const passport = require('passport');
-const crypto = require('crypto');
-const routes = require('./routes');
-const connection = require('./database/config');
-require('./auth/passport');
-require('dotenv').config();
 
-const MongoStore = require('connect-mongo')(session);
+require ('dotenv').config();
 
 const app = express();
+require('./config/database');
+require('./models/user');
+require('./config/passport')(passport);
+
+app.use(passport.initialize());
+
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(cors());
 
-app.use(routes);
+app.use(express.static(path.join(__dirname, 'frontend', 'public')));
+
+app.use(require('./routes'));
 
 app.listen(3000);
